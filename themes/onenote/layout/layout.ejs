@@ -2,11 +2,15 @@
 <html lang="<%= config.language %>">
     <%- partial('_partial/head') %>
     <body>
+        <% if (is_post()) { %>
+            <%- partial('_partial/progress-bar') %>
+        <% } %>
         <div class="paper">
             <div class="paper-main">
                 <%- body %>
                 <%- partial('_partial/footer') %>
             </div>
         </div>
+        <script src="<%= url_for('/js/custom.js') %>"></script>
     </body>
 </html>

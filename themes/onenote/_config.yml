@@ -1,8 +1,7 @@
 menu:
   首页: /
   归档: /archives
-  工具: /p/cim.html
-  游戏: /p/snake.html
+  工具: /tools/
 
 
 language: zh-CN

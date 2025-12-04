@@ -464,3 +464,214 @@ a
     color: #999999; /* 悬停时改变颜色，可以根据需要自定义 */
       text-decoration: underline; /* 悬停时显示下划线 */
 }
+
+/* === 阅读进度条 === */
+.progress-bar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: transparent;
+  z-index: 9999;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(58,137,255,1) 0%, rgba(133,88,255,1) 100%);
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* === 目录导航 === */
+.toc-container {
+  position: fixed;
+  top: 150px;
+  right: 20px;
+  width: 220px;
+  max-height: calc(100vh - 200px);
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.toc-title {
+  font-weight: 600;
+  margin-bottom: 15px;
+  font-size: 1.1em;
+  border-bottom: 2px solid var(--line-1);
+  padding-bottom: 10px;
+  color: var(--font-color-1);
+}
+
+.toc-container ol {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-container .toc-item {
+  margin: 8px 0;
+}
+
+.toc-container .toc-link {
+  color: var(--font-color-2);
+  text-decoration: none;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+  display: block;
+  padding: 4px 0;
+  border-left: 2px solid transparent;
+  padding-left: 8px;
+}
+
+.toc-container .toc-link:hover {
+  color: #3a89ff;
+  border-left-color: #3a89ff;
+  padding-left: 12px;
+}
+
+.toc-container .toc-child {
+  padding-left: 15px;
+}
+
+.toc-toggle-button {
+  display: none;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 55px;
+  height: 55px;
+  font-size: 24px;
+  background-color: #ffffff;
+  border: 2px solid #eee;
+  border-radius: 50%;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 1001;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toc-toggle-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.16);
+}
+
+@media (max-width: 1024px) {
+  .toc-container {
+    top: 0;
+    right: 0;
+    width: 280px;
+    max-height: 100%;
+    height: 100%;
+    border-radius: 0;
+    transform: translateX(100%);
+    overflow-y: auto;
+    padding-top: 60px;
+  }
+
+  .toc-container.is-visible {
+    transform: translateX(0);
+  }
+
+  .toc-toggle-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* === 文章卡片动画效果 === */
+.post {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 8px;
+  padding: 20px;
+  background: #fff;
+}
+
+.post:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* === 滚动触发淡入动画 === */
+.fade-in-element {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.fade-in-element.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === 平滑滚动 === */
+html {
+  scroll-behavior: smooth;
+}
+
+/* === 工具页面样式 === */
+.tools-page-container {
+  width: 100%;
+}
+
+.tools-page-container .page-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: var(--font-color-1);
+  text-align: center;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.tool-card {
+  background-color: #fff;
+  padding: 32px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+}
+
+.tool-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.tool-card h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--font-color-1);
+}
+
+.tool-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.tool-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.tool-description {
+  color: var(--font-color-3);
+  font-size: 0.95rem;
+  margin: 0;
+}
+

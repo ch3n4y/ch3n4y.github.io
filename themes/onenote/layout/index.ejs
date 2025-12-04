@@ -17,7 +17,7 @@ const sortedPosts = sortPosts(page.posts.data);
 %>
 <div class="post-list">
     <% sortedPosts.forEach(function (post) { %>
-    <div class="post <%= post.sticky ? 'sticky' : '' %>">
+    <div class="post fade-in-element <%= post.sticky ? 'sticky' : '' %>">
         <a class="post-title" href="<%- url_for(post.path) %>"><%= post.title %></a>
         <div class="post-except">
             <%- strip_html(post.content).substr(0, 240) %>
