@@ -1,0 +1,990 @@
+---
+layout: false
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>胖哥美味小炒店</title>
+    <style>
+        :root {
+            --primary-color: #D32F2F; /* 品牌红 */
+            --accent-color: #FFC107;  /* 品牌黄 */
+            --text-dark: #333;
+            --text-light: #888;
+            --bg-gray: #f5f5f5;
+            --white: #ffffff;
+            --sidebar-bg: #f7f8fa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--white);
+        }
+
+        /* === 顶部区域 === */
+        .header-container {
+            height: 96px;
+            background: white;
+            z-index: 10;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .header-title {
+            height: 46px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .header-subtitle {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            margin-left: 10px;
+            font-weight: normal;
+        }
+
+        .search-bar {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            height: 32px;
+            background-color: #f2f2f2;
+            border: none;
+            border-radius: 16px;
+            padding: 0 35px 0 15px;
+            font-size: 0.9rem;
+            outline: none;
+            /* 简单的SVG搜索图标 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23999'%3E%3Cpath d='M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        /* === 主体布局 (左右分栏) === */
+        .main-container {
+            display: flex;
+            height: calc(100% - 96px - 50px); /* 减去顶部和底部栏高度 */
+        }
+
+        /* 左侧侧边栏 */
+        .sidebar {
+            width: 86px;
+            background-color: var(--sidebar-bg);
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 16px 8px;
+            font-size: 0.85rem;
+            color: #666;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            background-color: var(--white);
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+        
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 20px;
+            background-color: var(--primary-color);
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* 右侧内容 */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+            padding: 0 12px;
+            scroll-behavior: smooth;
+        }
+
+        .category-header {
+            font-size: 0.9rem;
+            color: #333;
+            font-weight: bold;
+            padding: 15px 0 10px 0;
+            background: rgba(255,255,255,0.95);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            backdrop-filter: blur(5px);
+        }
+
+        /* 菜品卡片 */
+        .dish-item {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .dish-img-box {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            flex-shrink: 0;
+            background-color: #fce4ec;
+        }
+
+        .dish-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2px 0;
+        }
+
+        .dish-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #222;
+            line-height: 1.2;
+        }
+        
+        .dish-tag {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 4px;
+            background: #f5f5f5;
+            padding: 1px 4px;
+            border-radius: 4px;
+            display: inline-block;
+            align-self: flex-start;
+        }
+
+        .dish-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .dish-price {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.15rem;
+            display: flex;
+            align-items: baseline;
+        }
+        
+        .dish-price span {
+            font-size: 0.8rem;
+            margin-right: 1px;
+        }
+
+        /* 按钮组件 */
+        .btn-add {
+            width: 26px;
+            height: 26px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(211,47,47,0.2);
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+        }
+        
+        .btn-minus {
+            width: 26px;
+            height: 26px;
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 0.8;
+            cursor: pointer;
+        }
+
+        .qty-num {
+            width: 32px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* === 底部购物车栏 === */
+        .cart-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #222;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            padding-left: 80px;
+        }
+
+        .cart-icon-wrapper {
+            position: absolute;
+            left: 15px;
+            top: -15px;
+            width: 50px;
+            height: 50px;
+            background-color: #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid #444;
+            transition: all 0.3s;
+        }
+        
+        .cart-icon-wrapper.active {
+            background-color: var(--accent-color);
+            border-color: #222;
+            color: #222;
+        }
+
+        .cart-icon {
+            font-size: 1.5rem;
+            color: #666;
+        }
+        
+        .cart-icon-wrapper.active .cart-icon {
+            color: #222;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 0.65rem;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid white;
+            display: none;
+        }
+
+        .total-price {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .delivery-text {
+            color: #999;
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
+
+        .btn-checkout {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 110px;
+            background-color: #444;
+            color: #999;
+            border: none;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: not-allowed;
+        }
+        
+        .btn-checkout.active {
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+        }
+
+        /* === 购物车详情弹窗 (底部滑出) === */
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+            display: none;
+            backdrop-filter: blur(2px);
+        }
+
+        .cart-popup {
+            position: fixed;
+            bottom: 50px;
+            left: 0;
+            width: 100%;
+            background: white;
+            z-index: 95;
+            border-radius: 16px 16px 0 0;
+            display: none;
+            flex-direction: column;
+            max-height: 60vh;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .popup-header {
+            padding: 12px 15px;
+            background-color: #f7f8fa;
+            display: flex;
+            justify-content: space-between;
+            border-radius: 16px 16px 0 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .popup-list {
+            overflow-y: auto;
+            padding: 0 15px 15px 15px;
+        }
+
+        .popup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        /* === 结算确认弹窗 (居中) === */
+        .confirm-mask {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .confirm-modal {
+            background: white;
+            width: 85%;
+            max-width: 320px;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: popIn 0.2s ease-out;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .confirm-header {
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #eee;
+            background-color: #f7f8fa;
+        }
+
+        .confirm-body {
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #fff;
+        }
+
+        /* 模拟文本域外观 */
+        .order-preview {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #444;
+            white-space: pre-wrap; /* 保留换行 */
+            line-height: 1.4;
+            border: 1px solid #e0e0e0;
+        }
+
+        .confirm-footer {
+            display: flex;
+            border-top: 1px solid #eee;
+        }
+
+        .c-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: white;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .c-btn:active { background: #f0f0f0; }
+
+        .c-btn-cancel { color: #666; border-right: 1px solid #eee; }
+        .c-btn-ok { color: var(--primary-color); font-weight: bold; }
+
+
+        /* === Toast 提示 === */
+        .toast {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 3000;
+            display: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-container">
+    <div class="header-title">
+        胖哥美味小炒店 <span class="header-subtitle">/ 物美价廉 经济实惠</span>
+    </div>
+    <div class="search-bar">
+        <input type="text" class="search-input" id="search-input" placeholder="输入菜名搜索..." oninput="handleSearch()">
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="content" id="content-scroll">
+        <div id="menu-list"></div>
+        <div style="height: 60px;"></div> </div>
+</div>
+
+<div class="cart-bar" onclick="toggleCart()">
+    <div class="cart-icon-wrapper" id="cart-icon-wrap">
+        <span class="cart-icon">🛒</span>
+        <div class="cart-badge" id="cart-badge">0</div>
+    </div>
+    <div style="flex:1">
+        <div class="total-price" id="total-price">¥0</div>
+        <div class="delivery-text">无需配送费</div>
+    </div>
+    <button class="btn-checkout" id="btn-checkout" onclick="preCheckout(event)">去结算</button>
+</div>
+
+<div class="modal-mask" id="cart-mask" onclick="toggleCart()"></div>
+<div class="cart-popup" id="cart-popup">
+    <div class="popup-header">
+        <span style="font-size:0.9rem; color:#666;">已选商品</span>
+        <span style="font-size:0.85rem; color:#999; cursor:pointer;" onclick="clearCart()">清空</span>
+    </div>
+    <div class="popup-list" id="cart-list-dom"></div>
+</div>
+
+<div class="confirm-mask" id="confirm-mask">
+    <div class="confirm-modal">
+        <div class="confirm-header">请核对订单</div>
+        <div class="confirm-body">
+            <div class="order-preview" id="order-preview-text"></div>
+        </div>
+        <div class="confirm-footer">
+            <button class="c-btn c-btn-cancel" onclick="closeConfirmModal()">取消</button>
+            <button class="c-btn c-btn-ok" onclick="finalCopy()">确认复制</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast">已复制！<br>请发送给老板</div>
+
+<script>
+    // === 1. 数据源 (完整菜品) ===
+    const menuData = [
+        {
+            category: "特价 / 蛋类",
+            id: "cat1",
+            emoji: "🍳", 
+            bgColor: "#FFF3E0", 
+            items: [
+                { name: "麻婆豆腐", price: 12 }, { name: "酸辣土豆丝", price: 12 },
+                { name: "酸辣大白菜", price: 12 }, { name: "手撕包菜", price: 12 },
+                { name: "炒时蔬", price: 12 }, { name: "西红柿炒蛋", price: 13, icon: "🍅" },
+                { name: "苦瓜炒蛋", price: 13 }, { name: "青瓜炒蛋", price: 13 },
+                { name: "青椒炒蛋", price: 13 }, { name: "腐竹炒蛋", price: 13 },
+                { name: "韭菜炒蛋", price: 13 }, { name: "外婆菜炒蛋", price: 13 },
+                { name: "火腿炒蛋", price: 13 }, { name: "韭黄炒蛋", price: 15 },
+                { name: "韭菜煎蛋", price: 12 }, { name: "葱花煎蛋", price: 12 },
+                { name: "萝卜干煎蛋", price: 15 }, { name: "苦瓜煎蛋", price: 15 }
+            ]
+        },
+        {
+            category: "家常小炒",
+            id: "cat2",
+            emoji: "🥘",
+            bgColor: "#E8F5E9",
+            items: [
+                { name: "金针菇炒肉", price: 13 }, { name: "家常豆腐", price: 13 },
+                { name: "红烧茄子", price: 13, icon: "🍆" }, { name: "干煸土豆片", price: 13, icon: "🥔" },
+                { name: "干煸花菜", price: 13, icon: "🥦" }, { name: "芹菜炒肉", price: 13 },
+                { name: "鱼香肉丝", price: 13 }, { name: "酸菜炒肉", price: 13 },
+                { name: "榨菜炒肉", price: 13 }, { name: "木耳炒肉", price: 13 },
+                { name: "酸豆角肉沫", price: 13 }, { name: "榨菜鸡胸肉", price: 13 },
+                { name: "酸菜鸡胸肉", price: 13 }, { name: "蒜苔鸡胸肉", price: 13 },
+                { name: "胡萝卜炒肉", price: 13, icon: "🥕" }, { name: "青瓜炒火腿", price: 13 },
+                { name: "青瓜炒肉", price: 13 }, { name: "青菜肉片", price: 13 },
+                { name: "芹菜香干肉丝", price: 13 }, { name: "土豆丝炒肉", price: 13 }
+            ]
+        },
+        {
+            category: "鸡杂 / 猪杂",
+            id: "cat3",
+            emoji: "🍗",
+            bgColor: "#FFEBEE",
+            items: [
+                { name: "红烧鱼块", price: 15, icon: "🐟" }, { name: "金针菇炒鸡肉", price: 15 },
+                { name: "香菇炒鸡肉", price: 15, icon: "🍄" }, { name: "洋葱炒鸡肉", price: 15, icon: "🧅" },
+                { name: "土豆炒鸡肉", price: 15 }, { name: "青椒炒鸡肉", price: 15 },
+                { name: "酸菜鸡杂", price: 15 }, { name: "酸辣鸡杂", price: 15 },
+                { name: "爆炒鸡杂", price: 15 }, { name: "爆炒猪耳", price: 15, icon: "👂" },
+                { name: "爆炒猪肝", price: 15 }, { name: "爆炒猪杂", price: 15 },
+                { name: "酸辣猪肝", price: 15 }, { name: "烟笋炒五花肉", price: 15 }
+            ]
+        },
+        {
+            category: "腊味 / 回锅",
+            id: "cat4",
+            emoji: "🥓",
+            bgColor: "#FFF8E1",
+            items: [
+                { name: "四季豆炒腊肉", price: 15 }, { name: "莴笋炒腊肉", price: 15 },
+                { name: "兰豆炒腊肉", price: 15 }, { name: "蒜苔炒腊肉", price: 15 },
+                { name: "青椒炒腊肉", price: 15 }, { name: "洋葱炒腊肉", price: 15 },
+                { name: "香干炒腊肉", price: 15 }, { name: "尖椒回锅肉", price: 15, icon: "🌶️" },
+                { name: "西兰花五花肉", price: 15 }, { name: "花菜五花肉", price: 15 },
+                { name: "土豆回锅肉", price: 15 }, { name: "香干回锅肉", price: 15 },
+                { name: "腐竹回锅肉", price: 15 }, { name: "油豆腐回锅肉", price: 15 },
+                { name: "四季豆回锅肉", price: 15 }, { name: "蒜苗回锅肉", price: 15 }
+            ]
+        },
+        {
+            category: "特色小炒",
+            id: "cat5",
+            emoji: "🍲",
+            bgColor: "#E3F2FD",
+            items: [
+                { name: "小炒肉", price: 15 }, { name: "丝瓜炒肉", price: 15 },
+                { name: "莲藕炒肉", price: 15 }, { name: "咸鱼茄子", price: 15 },
+                { name: "豆角炒肉", price: 15 }, { name: "茄子豆角", price: 15 },
+                { name: "莴笋炒肉", price: 15 }, { name: "青椒炒肉卷", price: 15 },
+                { name: "芹菜炒肉卷", price: 15 }, { name: "腐竹焖鸡", price: 15 },
+                { name: "农家一碗香", price: 15 }, { name: "红烧日本豆腐", price: 15 },
+                { name: "虎皮尖椒", price: 15 }, { name: "凉瓜炒肉", price: 15 },
+                { name: "香菇炒肉", price: 15 }, { name: "包菜回锅肉", price: 15 },
+                { name: "荷兰豆炒肉", price: 15 }
+            ]
+        },
+        {
+            category: "肥肠 / 牛肉",
+            id: "cat6",
+            emoji: "🐂",
+            bgColor: "#F3E5F5",
+            items: [
+                { name: "酸菜大肠", price: 18 }, { name: "酸辣肥肠", price: 18 },
+                { name: "爆炒肥肠", price: 18 }, { name: "青椒炒牛肉", price: 18 },
+                { name: "芥兰炒牛肉", price: 18 }, { name: "凉瓜炒牛肉", price: 18 },
+                { name: "荷兰豆炒牛肉", price: 18 }, { name: "金针菇炒牛肉", price: 18 },
+                { name: "小炒牛肉", price: 20 }, { name: "凉拌皮蛋", price: 15, icon: "🥚" },
+                { name: "凉拌青瓜", price: 15, icon: "🥒" }, { name: "凉拌猪耳", price: 20 }
+            ]
+        },
+        {
+            category: "招牌硬菜",
+            id: "cat7",
+            emoji: "🔥",
+            bgColor: "#FFEBEE",
+            items: [
+                { name: "宫保鸡丁", price: 17 }, { name: "辣子鸡", price: 18, icon: "🐔" },
+                { name: "酸菜焖鱼块", price: 20, icon: "🐟" }, { name: "腐竹焖鱼块", price: 20, icon: "🐟" },
+                { name: "姜葱炒鸡", price: 20 }, { name: "酸菜鱼", price: 25, icon: "🐟" },
+                { name: "水煮鱼", price: 25, icon: "🌶️" }, { name: "水煮肉片", price: 25, icon: "🥩" },
+                { name: "红烧鱼", price: 28, icon: "🐟" }, { name: "水煮牛肉", price: 30, icon: "🐂" },
+                { name: "酸甜排骨", price: 30, icon: "🦴" }, { name: "红烧排骨", price: 30, icon: "🦴" }
+            ]
+        },
+        {
+            category: "砂锅煲类",
+            id: "cat8",
+            emoji: "🥣",
+            bgColor: "#EFEBE9",
+            items: [
+                { name: "杂菇排骨煲", price: 18 }, { name: "花菜五花肉煲", price: 15 },
+                { name: "花菜排骨煲", price: 18 }, { name: "春菜五花肉煲", price: 15 },
+                { name: "春菜排骨煲", price: 18 }, { name: "苦瓜五花肉煲", price: 15 },
+                { name: "苦瓜排骨煲", price: 18 }, { name: "腐竹五花肉煲", price: 15 },
+                { name: "腐竹排骨煲", price: 18 }, { name: "酸菜大肠煲", price: 18 },
+                { name: "酸菜排骨煲", price: 18 }, { name: "日本豆腐煲", price: 18 },
+                { name: "茄子煲", price: 18 }, { name: "土豆牛腩煲", price: 20 },
+                { name: "腐竹牛腩煲", price: 20 }, { name: "油豆腐牛腩煲", price: 20 }
+            ]
+        },
+        {
+            category: "主食 / 汤类",
+            id: "cat9",
+            emoji: "🍚",
+            bgColor: "#F1F8E9",
+            items: [
+                { name: "牛肉炒饭", price: 15 }, { name: "干炒牛河", price: 15, icon: "🍜" },
+                { name: "湿炒牛河", price: 15, icon: "🍜" }, { name: "蛋肉炒饭", price: 12 },
+                { name: "炒河粉(汤)", price: 12, icon: "🍜" }, { name: "炒米粉(汤)", price: 12, icon: "🍜" },
+                { name: "西红柿蛋汤", price: 12 }, { name: "紫菜蛋花汤", price: 12 },
+                { name: "猪杂汤", price: 15 }, { name: "鱼头豆腐汤", price: 15 },
+                { name: "枸杞叶瘦肉汤", price: 15 }
+            ]
+        }
+    ];
+
+    let cart = {}; // { itemId: num }
+    let idMap = {}; // id -> item
+    let globalId = 1;
+
+    // 预处理数据：分配ID和图标
+    menuData.forEach(cat => {
+        cat.items.forEach(item => {
+            item.id = globalId++;
+            item.catId = cat.id;
+            if(!item.icon) item.icon = cat.emoji;
+            item.bgColor = cat.bgColor; 
+            idMap[item.id] = item;
+        });
+    });
+
+    let isNavClick = false; // 用于控制滚动监听
+
+    // === 2. 初始化 ===
+    function init() {
+        renderSidebar();
+        renderMenu(menuData);
+        document.getElementById('content-scroll').addEventListener('scroll', onScroll);
+    }
+
+    // 渲染左侧
+    function renderSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        let html = '';
+        menuData.forEach((cat, idx) => {
+            const active = idx === 0 ? 'active' : '';
+            html += `<div class="nav-item ${active}" id="nav-${cat.id}" onclick="clickNav('${cat.id}')">
+                ${cat.category.split('/')[0]}
+            </div>`;
+        });
+        sidebar.innerHTML = html;
+    }
+
+    // 渲染右侧
+    function renderMenu(data) {
+        const list = document.getElementById('menu-list');
+        let html = '';
+
+        data.forEach(cat => {
+            if(cat.items.length === 0) return;
+
+            html += `<div class="category-header" id="header-${cat.id}">${cat.category}</div>`;
+            html += `<div class="category-group" id="group-${cat.id}">`;
+            
+            cat.items.forEach(item => {
+                const count = cart[item.id] || 0;
+                html += `
+                    <div class="dish-item">
+                        <div class="dish-img-box" style="background-color: ${item.bgColor}">
+                            ${item.icon}
+                        </div>
+                        <div class="dish-info">
+                            <div class="dish-name">${item.name}</div>
+                            <div class="dish-tag">老板推荐</div>
+                            <div class="dish-action">
+                                <div class="dish-price"><span>¥</span>${item.price}</div>
+                                <div class="qty-control">
+                                    <div class="btn-minus" id="minus-${item.id}" 
+                                         style="display:${count>0?'flex':'none'}"
+                                         onclick="updateCart(${item.id}, -1)">-</div>
+                                    <div class="qty-num" id="num-${item.id}"
+                                         style="display:${count>0?'block':'none'}">${count}</div>
+                                    <div class="btn-add" onclick="updateCart(${item.id}, 1)">+</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+        });
+
+        if(!html) html = '<div style="text-align:center;padding:50px;color:#999">未找到相关菜品</div>';
+        list.innerHTML = html;
+    }
+
+    // === 3. 基础交互 ===
+    function clickNav(catId) {
+        isNavClick = true;
+        document.querySelectorAll('.nav-item').forEach(d => d.classList.remove('active'));
+        document.getElementById('nav-'+catId).classList.add('active');
+        const target = document.getElementById('header-'+catId);
+        if(target) target.scrollIntoView({behavior: "smooth"});
+        setTimeout(() => isNavClick = false, 600);
+    }
+
+    function onScroll() {
+        if(isNavClick) return;
+        const container = document.getElementById('content-scroll');
+        const headers = document.querySelectorAll('.category-header');
+        let currentId = '';
+        headers.forEach(h => {
+            if(h.offsetTop - container.offsetTop <= container.scrollTop + 50) {
+                currentId = h.id.replace('header-', '');
+            }
+        });
+        if(currentId) {
+            document.querySelectorAll('.nav-item').forEach(d => d.classList.remove('active'));
+            const nav = document.getElementById('nav-'+currentId);
+            if(nav) {
+                nav.classList.add('active');
+                nav.scrollIntoView({behavior:"smooth", block:"center"});
+            }
+        }
+    }
+
+    function handleSearch() {
+        const key = document.getElementById('search-input').value.trim();
+        if(!key) {
+            renderMenu(menuData);
+            restoreUI();
+            return;
+        }
+        const filtered = menuData.map(cat => ({
+            ...cat,
+            items: cat.items.filter(i => i.name.includes(key))
+        })).filter(c => c.items.length > 0);
+        renderMenu(filtered);
+        restoreUI();
+    }
+
+    function restoreUI() {
+        for(let id in cart) {
+            updateSingleUI(id, cart[id]);
+        }
+    }
+
+    // === 4. 购物车逻辑 ===
+    function updateCart(id, delta) {
+        if(!cart[id]) cart[id] = 0;
+        cart[id] += delta;
+        if(cart[id] <= 0) delete cart[id];
+        
+        updateSingleUI(id, cart[id] || 0);
+        calcTotal();
+
+        // 弹窗实时更新
+        if(document.getElementById('cart-mask').style.display === 'block') {
+            renderPopupList();
+            if(Object.keys(cart).length === 0) toggleCart();
+        }
+        // 确认弹窗如果开着，也要关掉（防止修改了数量后复制内容不对）
+        if(document.getElementById('confirm-mask').style.display === 'flex') {
+             closeConfirmModal();
+        }
+    }
+
+    function updateSingleUI(id, count) {
+        const minus = document.getElementById('minus-'+id);
+        const num = document.getElementById('num-'+id);
+        if(minus && num) {
+            minus.style.display = count > 0 ? 'flex' : 'none';
+            num.style.display = count > 0 ? 'block' : 'none';
+            num.innerText = count;
+        }
+    }
+
+    function calcTotal() {
+        let total = 0;
+        let count = 0;
+        for(let id in cart) {
+            total += idMap[id].price * cart[id];
+            count += cart[id];
+        }
+        document.getElementById('total-price').innerText = '¥' + total;
+        document.getElementById('cart-badge').innerText = count;
+        
+        const wrap = document.getElementById('cart-icon-wrap');
+        const badge = document.getElementById('cart-badge');
+        const btn = document.getElementById('btn-checkout');
+
+        if(count > 0) {
+            wrap.classList.add('active');
+            badge.style.display = 'flex';
+            btn.classList.add('active');
+            btn.innerText = '去结算';
+        } else {
+            wrap.classList.remove('active');
+            badge.style.display = 'none';
+            btn.classList.remove('active');
+            btn.innerText = '未选购';
+        }
+    }
+
+    function toggleCart() {
+        if(Object.keys(cart).length === 0) return;
+        const mask = document.getElementById('cart-mask');
+        const popup = document.getElementById('cart-popup');
+        
+        if(mask.style.display === 'block') {
+            mask.style.display = 'none';
+            popup.style.display = 'none';
+        } else {
+            renderPopupList();
+            mask.style.display = 'block';
+            popup.style.display = 'flex';
+        }
+    }
+
+    function renderPopupList() {
+        const dom = document.getElementById('cart-list-dom');
+        let html = '';
+        for(let id in cart) {
+            const item = idMap[id];
+            html += `
+                <div class="popup-item">
+                    <div style="flex:1">
+                        <div style="font-weight:bold">${item.name}</div>
+                        <div style="font-size:0.8rem;color:#999">¥${item.price}</div>
+                    </div>
+                    <div class="qty-control">
+                        <div class="btn-minus" onclick="updateCart(${item.id}, -1)">-</div>
+                        <div class="qty-num">${cart[id]}</div>
+                        <div class="btn-add" onclick="updateCart(${item.id}, 1)">+</div>
+                    </div>
+                </div>
+            `;
+        }
+        dom.innerHTML = html;
+    }
+
+    function clearCart() {
+        if(confirm("清空购物车？")) {
+            cart = {};
+            calcTotal();
+            renderMenu(menuData);
+            toggleCart();
+        }
+    }
+
+    // === 5. 结算确认逻辑 (新功能) ===
+    
+    let currentOrderText = "";
+
+    // 点击“去结算”
+    function preCheckout(e) {
+        e.stopPropagation();
+        if(Object.keys(cart).length === 0) return;
+
+        // 生成订单文本
+        let text = "【胖哥小炒 订单】\n";
+        let sum = 0;
+        let totalCount = 0;
+        
+        for(let id in cart) {
+            const item = idMap[id];
+            const sub = item.price * cart[id];
+            sum += sub;
+            totalCount += cart[id];
+            text += `${item.name} x${cart[id]} = ${sub}\n`;
+        }
+        text += `---------------\n共 ${totalCount} 份，总计：¥${sum}`;
+
+        currentOrderText = text;
+
+        // 显示确认弹窗
+        document.getElementById('order-preview-text').innerText = text;
+        document.getElementById('confirm-mask').style.display = 'flex';
+    }
+
+    // 关闭确认弹窗
+    function closeConfirmModal() {
+        document.getElementById('confirm-mask').style.display = 'none';
+    }
+
+    // 最终复制
+    function finalCopy() {
+        copyToClip(currentOrderText);
+        closeConfirmModal();
+        
+        // 可选：复制成功后是否关闭底部的购物车详情？
+        const cartMask = document.getElementById('cart-mask');
+        if(cartMask.style.display === 'block') toggleCart();
+    }
+
+    function copyToClip(content) {
+        const aux = document.createElement("textarea"); 
+        aux.value = content; 
+        document.body.appendChild(aux); 
+        aux.select(); 
+        document.execCommand("copy"); 
+        document.body.removeChild(aux);
+        
+        const t = document.getElementById('toast');
+        t.style.display = 'block';
+        setTimeout(()=>t.style.display='none', 2500);
+    }
+
+    init();
+</script>
+
+</body>
+</html>
